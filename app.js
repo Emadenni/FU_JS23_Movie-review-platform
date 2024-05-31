@@ -6,9 +6,9 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-/* app.use("/api/movies", movieRoutes);
-app.use("/api/reviews", reviewRoutes);
- */
+ app.use("/api/movies", movieRoutes);
+ 
+/* app.use("/api/reviews", reviewRoutes); */
 app.use("/api", userRoutes);
 
 
