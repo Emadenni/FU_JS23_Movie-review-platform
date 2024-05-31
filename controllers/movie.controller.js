@@ -30,10 +30,9 @@ exports.updateMovie = async (req, res) => {
       return res.status(404).send("Movie not found");
     }
 
-    updates.forEach(update=>movie[update] = req.body[update]);
+    updates.forEach((update) => (movie[update] = req.body[update]));
     await movie.save();
     res.status(200).send(movie);
-
   } catch (error) {
     res.status(500).send(error);
   }
@@ -43,26 +42,37 @@ exports.deleteMovie = async (req, res) => {
   try {
     const movie = await Movie.findByIdAndDelete(req.params.id);
     if (!movie) {
-      return res.status(404).send("Movie not found")
+      return res.status(404).send("Movie not found");
     }
 
-    res.status(200).send("Movie deleted succesfully")
+    res.status(200).send("Movie deleted succesfully");
   } catch (error) {
     res.status(500).send(error);
   }
-
-}
+};
 
 exports.getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) {
-      return res.status(404).send("Movie not found")
+      return res.status(404).send("Movie not found");
     }
 
-    res.status(200).send(movie)
-    
+    res.status(200).send(movie);
   } catch (error) {
     res.status(500).send(error);
   }
-}
+};
+
+exports.getAllMovies = async (req, res) => {
+  try {
+    const movies = await Movie.find();
+    if (!movies) {
+      return res.status(404).send("No movies found");
+    }
+
+    res.status(200).send(movies);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};

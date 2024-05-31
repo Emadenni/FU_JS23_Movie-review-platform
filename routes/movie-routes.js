@@ -8,5 +8,6 @@ router.post("/", auth, authorizeAdmin, movieController.addMovie);
 router.put("/:id", auth, authorizeAdmin, movieController.updateMovie);
 router.delete("/:id", auth, authorizeAdmin, movieController.deleteMovie);
 router.get("/:id", auth, movieController.getMovieById);
+router.get("/", auth, movieController.getAllMovies);
 
 module.exports = router;
