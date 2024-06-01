@@ -1,7 +1,8 @@
 const Movie = require("../models/movie-model");
+const requiredMovieFields = ['title', 'director', 'releaseYear', 'genre'];
 
 exports.addMovie = async (req, res) => {
-  try {
+try {
     const { title, director, releaseYear, genre } = req.body;
     const existingMovie = await Movie.findOne({ title });
     if (existingMovie) {
@@ -76,3 +77,5 @@ exports.getAllMovies = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+module.exports.requiredMovieFields = requiredMovieFields;
