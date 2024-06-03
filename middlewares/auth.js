@@ -11,7 +11,7 @@ exports.auth = (req, res, next) => {
     const formattedToken = token.replace("Bearer ", "");
     const decoded = jwt.verify(formattedToken, process.env.JWT_SECRET);
     req.user = decoded; 
-    console.log(req.user.userId);
+    /* console.log(req.user.userId); */
     next();
   } catch (error) {
     console.error("Invalid token:", error);
