@@ -51,6 +51,16 @@ exports.deleteReview = async (req, res) => {
   }
 }
 
-
+exports.getReviewById = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).send("Review not found")
+    }
+    res.status(200).send(review);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
 module.exports.requiredCreateReviewFields = requiredCreateReviewFields;
 module.exports.requiredUpdateReviewFields = requiredUpdateReviewFields;
