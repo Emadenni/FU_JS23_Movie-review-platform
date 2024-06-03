@@ -9,4 +9,5 @@ router.post("/", auth, validateFields(reviewController.requiredCreateReviewField
 router.put("/:id",  auth,  isAuthor, validateFields(reviewController.requiredUpdateReviewFields),  reviewController.updateReview);
 router.delete("/:id", auth, isAuthor, reviewController.deleteReview)
 router.get("/:id",auth, reviewController.getReviewById )
+router.get("/",auth, reviewController.getAllReviews )
 module.exports = router;
