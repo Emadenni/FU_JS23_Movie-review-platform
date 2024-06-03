@@ -1,3 +1,4 @@
+const e = require("express");
 const Review = require("../models/review-model");
 const requiredCreateReviewFields = ["movieId", "userId", "rating", "comment"];
 const requiredUpdateReviewFields = ["rating", "comment"];
@@ -36,5 +37,20 @@ exports.updateReview = async (req, res) => {
     res.status(500).send(error);
   }
 }
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndDelete(req.params.id);
+    if (!review) {
+      return res.status(404).send("Review not found")
+    }
+    res.status(200).send("Review deleted succesfully");
+  } catch (error) {
+    res.status(500).send(error);
+  
+  }
+}
+
+
 module.exports.requiredCreateReviewFields = requiredCreateReviewFields;
 module.exports.requiredUpdateReviewFields = requiredUpdateReviewFields;
