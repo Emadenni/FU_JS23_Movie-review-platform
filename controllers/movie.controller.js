@@ -46,21 +46,8 @@ exports.deleteMovie = async (req, res) => {
     if (!movie) {
       return res.status(404).send("Movie not found");
     }
-
+    await Review.deleteMany({ movieId: movie._id });
     res.status(200).send("Movie deleted succesfully");
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-exports.getMovieById = async (req, res) => {
-  try {
-    const movie = await Movie.findById(req.params.id);
-    if (!movie) {
-      return res.status(404).send("Movie not found");
-    }
-
-    res.status(200).send(movie);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -85,7 +72,7 @@ exports.getMovieReviews = async (req, res) => {
     const reviews = await Review.find({ movieId: movieId });
 
     if (reviews.length === 0) {
-      return res.status(404).send("No reviews found for this movie");
+      return res.status(404).send("No reviews found for this movie. Check if the id exists.");
     }
 
     res.status(200).send(reviews);
@@ -94,51 +81,11 @@ exports.getMovieReviews = async (req, res) => {
   }
 };
 
-exports.getMovieRatings = async (req, res) => {
-  try {
-    const ratings = await Review.aggregate([
-      {
-        $group: {
-          _id: "$movieId",
-          averageRating: { $avg: "$rating" },
-        },
-      },
-      {
-        $lookup: {
-          from: "movies",
-          localField: "_id",
-          foreignField: "_id",
-          as: "movie",
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          title: { $arrayElemAt: ["$movie.title", 0] },
-          averageRating: 1,
-        },
-      },
-    ]);
-
-    if (ratings.length === 0) {
-      return res.status(404).send("No movies found with ratings");
-    }
-
-    res.status(200).send(ratings);
-  } catch (error) {
-    console.error("Error fetching movie ratings:", error);
-    res.status(500).send("Internal server error");
-  }
-};
-
-
-
 exports.getMoviesOrRatings = async (req, res) => {
   const { idOrRatings } = req.params;
 
-  if (idOrRatings === 'ratings') {
+  if (idOrRatings === "ratings") {
     try {
-      // Ottieni i rating dei film
       const ratings = await Review.aggregate([
         {
           $group: {
@@ -164,16 +111,16 @@ exports.getMoviesOrRatings = async (req, res) => {
       ]);
 
       if (ratings.length === 0) {
-        return res.status(404).send('No movies found with ratings');
+        return res.status(404).send("No movies found with ratings");
       }
 
-      res.status(200).send(ratings[0]); // Restituisci solo il primo elemento del risultato
+      res.status(200).send(ratings); 
     } catch (error) {
-      console.error('Error fetching movie ratings:', error);
-      res.status(500).send('Internal server error');
+      console.error("Error fetching movie ratings:", error);
+      res.status(500).send("Internal server error");
     }
   } else {
-    // Gestisci la richiesta per ottenere tutti i film o un film specifico
+    
     try {
       const movie = await Movie.findById(idOrRatings);
       if (!movie) {
@@ -182,8 +129,8 @@ exports.getMoviesOrRatings = async (req, res) => {
 
       res.status(200).send(movie);
     } catch (error) {
-      console.error('Error fetching movie by ID:', error);
-      res.status(500).send('Internal server error');
+      console.error("Error fetching movie by ID:", error);
+      res.status(500).send("Internal server error");
     }
   }
 };

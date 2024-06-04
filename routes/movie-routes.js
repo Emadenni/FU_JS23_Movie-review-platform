@@ -9,9 +9,7 @@ const router = express.Router();
 router.post("/", auth, authorizeAdmin, validateFields(movieController.requiredMovieFields), movieController.addMovie);
 router.put("/:id", auth, authorizeAdmin, movieController.updateMovie);
 router.delete("/:id", auth, authorizeAdmin, movieController.deleteMovie);
-/* router.get("/:id", auth, movieController.getMovieById); */
 router.get("/", auth, movieController.getAllMovies);
 router.get("/:id/reviews", auth, movieController.getMovieReviews);
-router.get("/%2Fratings", auth, movieController.getMovieRatings);
 router.get('/:idOrRatings?', movieController.getMoviesOrRatings);
 module.exports = router;

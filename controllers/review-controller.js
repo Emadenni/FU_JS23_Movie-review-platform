@@ -75,5 +75,14 @@ exports.getAllReviews = async (req, res) => {
   }
 };
 
+exports.clearReviews = async (req, res) => {
+  try {
+    await Review.deleteMany({});
+    res.status(200).send("All reviews deleted successfully");
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
 module.exports.requiredCreateReviewFields = requiredCreateReviewFields;
 module.exports.requiredUpdateReviewFields = requiredUpdateReviewFields;
