@@ -1,9 +1,9 @@
 const Movie = require("../models/movie-model");
 const Review = require("../models/review-model");
-const requiredMovieFields = ['title', 'director', 'releaseYear', 'genre'];
+const requiredMovieFields = ["title", "director", "releaseYear", "genre"];
 
 exports.addMovie = async (req, res) => {
-try {
+  try {
     const { title, director, releaseYear, genre } = req.body;
     const existingMovie = await Movie.findOne({ title });
     if (existingMovie) {
@@ -80,16 +80,112 @@ exports.getAllMovies = async (req, res) => {
 };
 
 exports.getMovieReviews = async (req, res) => {
-try {
-  const movieId  = req.params.id;
-  const reviews = await Review.find({movieId:movieId});
+  try {
+    const movieId = req.params.id;
+    const reviews = await Review.find({ movieId: movieId });
 
-  if(reviews.length === 0) {
-    return res.status(404).send("No reviews found for this movie");
-  }
-  res.status(200).send(reviews);
+    if (reviews.length === 0) {
+      return res.status(404).send("No reviews found for this movie");
+    }
+
+    res.status(200).send(reviews);
   } catch (error) {
     res.status(500).send(error);
   }
-}
+};
+
+exports.getMovieRatings = async (req, res) => {
+  try {
+    const ratings = await Review.aggregate([
+      {
+        $group: {
+          _id: "$movieId",
+          averageRating: { $avg: "$rating" },
+        },
+      },
+      {
+        $lookup: {
+          from: "movies",
+          localField: "_id",
+          foreignField: "_id",
+          as: "movie",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          title: { $arrayElemAt: ["$movie.title", 0] },
+          averageRating: 1,
+        },
+      },
+    ]);
+
+    if (ratings.length === 0) {
+      return res.status(404).send("No movies found with ratings");
+    }
+
+    res.status(200).send(ratings);
+  } catch (error) {
+    console.error("Error fetching movie ratings:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
+
+
+exports.getMoviesOrRatings = async (req, res) => {
+  const { idOrRatings } = req.params;
+
+  if (idOrRatings === 'ratings') {
+    try {
+      // Ottieni i rating dei film
+      const ratings = await Review.aggregate([
+        {
+          $group: {
+            _id: "$movieId",
+            averageRating: { $avg: "$rating" },
+          },
+        },
+        {
+          $lookup: {
+            from: "movies",
+            localField: "_id",
+            foreignField: "_id",
+            as: "movie",
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            title: { $arrayElemAt: ["$movie.title", 0] },
+            averageRating: 1,
+          },
+        },
+      ]);
+
+      if (ratings.length === 0) {
+        return res.status(404).send('No movies found with ratings');
+      }
+
+      res.status(200).send(ratings[0]); // Restituisci solo il primo elemento del risultato
+    } catch (error) {
+      console.error('Error fetching movie ratings:', error);
+      res.status(500).send('Internal server error');
+    }
+  } else {
+    // Gestisci la richiesta per ottenere tutti i film o un film specifico
+    try {
+      const movie = await Movie.findById(idOrRatings);
+      if (!movie) {
+        return res.status(404).send("Movie not found");
+      }
+
+      res.status(200).send(movie);
+    } catch (error) {
+      console.error('Error fetching movie by ID:', error);
+      res.status(500).send('Internal server error');
+    }
+  }
+};
+
 module.exports.requiredMovieFields = requiredMovieFields;
