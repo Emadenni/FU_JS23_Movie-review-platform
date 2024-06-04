@@ -11,5 +11,6 @@ router.put("/:id", auth, authorizeAdmin, movieController.updateMovie);
 router.delete("/:id", auth, authorizeAdmin, movieController.deleteMovie);
 router.get("/:id", auth, movieController.getMovieById);
 router.get("/", auth, movieController.getAllMovies);
+router.get("/:id/reviews", auth, movieController.getMovieReviews);
 
 module.exports = router;

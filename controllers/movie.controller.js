@@ -1,4 +1,5 @@
 const Movie = require("../models/movie-model");
+const Review = require("../models/review-model");
 const requiredMovieFields = ['title', 'director', 'releaseYear', 'genre'];
 
 exports.addMovie = async (req, res) => {
@@ -78,4 +79,17 @@ exports.getAllMovies = async (req, res) => {
   }
 };
 
+exports.getMovieReviews = async (req, res) => {
+try {
+  const movieId  = req.params.id;
+  const reviews = await Review.find({movieId:movieId});
+
+  if(reviews.length === 0) {
+    return res.status(404).send("No reviews found for this movie");
+  }
+  res.status(200).send(reviews);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
 module.exports.requiredMovieFields = requiredMovieFields;
