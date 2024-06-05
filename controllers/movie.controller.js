@@ -24,15 +24,31 @@ exports.updateMovie = async (req, res) => {
   const isValidKeys = updates.every((update) => allowedUpdates.includes(update));
 
   if (!isValidKeys) {
-    return res.status(400).send("Invalide update fields");
+    return res.status(400).send("Invalid update fields");
   }
+
   try {
     const movie = await Movie.findById(req.params.id);
     if (!movie) {
       return res.status(404).send("Movie not found");
     }
 
+    const originalMovie = {
+      title: movie.title,
+      director: movie.director,
+      releaseYear: movie.releaseYear,
+      genre: movie.genre,
+    };
+
     updates.forEach((update) => (movie[update] = req.body[update]));
+
+    const isModified = updates.some((update) => movie[update] !== originalMovie[update]);
+    if (!isModified) {
+      return res.status(400).send("No updates provided");
+    }
+
+    movie.modifiedAt = new Date();
+
     await movie.save();
     res.status(200).send(movie);
   } catch (error) {

@@ -5,6 +5,8 @@ const movieSchema = new mongoose.Schema({
   director: { type: String, required: true },
   releaseYear: { type: Number, required: true },
   genre: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  modifiedAt:{type: Date}
 });
 
 movieSchema.pre("remove", async function (next) {
