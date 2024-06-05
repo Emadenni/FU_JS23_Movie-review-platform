@@ -1,18 +1,17 @@
-const e = require("express");
+const express = require("express");
 const Review = require("../models/review-model");
 const Movie = require("../models/movie-model");
-const requiredCreateReviewFields = ["movieId", "userId", "rating", "comment"];
+const requiredCreateReviewFields = ["movieId", "rating", "comment"];
 const requiredUpdateReviewFields = ["rating", "comment"];
+const jwt = require("jsonwebtoken");
 
 exports.createReview = async (req, res) => {
   try {
-    const { movieId, userId, rating, comment } = req.body;
-    const movie = await Movie.findById(movieId);
-    if (!movie) {
-      return res.status(404).send("Movie doesn't exist");
-    }
+    const userId = req.user.userId;
+    const { movieId, rating, comment } = req.body;
     const review = new Review({ movieId, userId, rating, comment });
     await review.save();
+
     res.status(201).send(review);
   } catch (error) {
     res.status(500).send(error);
@@ -57,7 +56,7 @@ exports.deleteReview = async (req, res) => {
 
 exports.getReviewById = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.id)
+    const review = await Review.findById(req.params.id);
     if (!review) {
       return res.status(404).send("Review not found");
     }
