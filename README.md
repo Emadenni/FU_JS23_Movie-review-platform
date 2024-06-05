@@ -22,3 +22,6 @@ This is an API for a movie review platform. It allows users to view and review m
 | DELETE | /reviews/:id             | Delete an existing review.                           |
 | GET    | /movies/ratings          | Get the list of all movies with their average ratings.|
 
+## Postman
+
+A file JSON is included in the repository for to import the provided Postman collection. 
