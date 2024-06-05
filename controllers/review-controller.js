@@ -28,14 +28,24 @@ exports.updateReview = async (req, res) => {
   }
 
   try {
-    const review = await Review.findByIdAndUpdate(req.params.id);
+    const review = await Review.findById(req.params.id);
     if (!review) {
       return res.status(404).send("Review not found");
     }
 
+    const originalReview = { ...review.toObject() };
+
     updates.forEach((update) => (review[update] = req.body[update]));
     review.modifiedAt = Date.now();
     await review.save();
+
+    const updatedReview = review.toObject();
+    const isModified = updates.some((update) => originalReview[update] !== updatedReview[update]);
+
+    if (!isModified) {
+      return res.status(400).send("No changes made to the review");
+    }
+
     res.status(200).send(review);
   } catch (error) {
     res.status(500).send(error);
