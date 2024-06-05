@@ -102,9 +102,12 @@ exports.getMoviesOrRatings = async (req, res) => {
           },
         },
         {
+          $unwind: "$movie",
+        },
+        {
           $project: {
             _id: 0,
-            title: { $arrayElemAt: ["$movie.title", 0] },
+            movie: "$movie",
             averageRating: 1,
           },
         },
@@ -114,13 +117,12 @@ exports.getMoviesOrRatings = async (req, res) => {
         return res.status(404).send("No movies found with ratings");
       }
 
-      res.status(200).send(ratings); 
+      res.status(200).send(ratings);
     } catch (error) {
       console.error("Error fetching movie ratings:", error);
       res.status(500).send("Internal server error");
     }
   } else {
-    
     try {
       const movie = await Movie.findById(idOrRatings);
       if (!movie) {
